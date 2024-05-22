@@ -14,7 +14,7 @@ RUN apk --update --no-cache add binutils clang curl file make pkgconf tar tree x
 FROM base AS base-build
 ENV XX_CC_PREFER_LINKER=ld
 ARG TARGETPLATFORM
-RUN xx-apk --no-cache add gcc g++ expat-dev hiredis hiredis-dev libevent-dev libcap libpcap-dev openssl-dev perl
+RUN xx-apk --no-cache add gcc g++ expat-dev hiredis hiredis-dev libevent-dev libcap libpcap-dev openssl-dev perl protobuf-c-dev
 RUN xx-clang --setup-target-triple
 
 FROM base AS unbound-src
@@ -45,6 +45,7 @@ RUN --mount=type=bind,from=unbound-src,source=/src/unbound,target=.,rw <<EOT
     --disable-rpath \
     --disable-shared \
     --enable-cachedb \
+    --enable-dnstap \
     --enable-event-api \
     --with-pthreads \
     --with-libhiredis=$(xx-info sysroot)usr \
@@ -102,6 +103,7 @@ RUN apk --update --no-cache add \
     hiredis \
     libevent \
     libpcap \
+    protobuf-c \
     openssl \
     shadow \
   && mkdir -p /run/unbound \

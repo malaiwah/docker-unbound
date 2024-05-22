@@ -31,7 +31,7 @@ FROM base-build AS unbound-build
 WORKDIR /src/unbound
 RUN --mount=type=bind,from=unbound-src,source=/src/unbound,target=.,rw <<EOT
   set -ex
-  CC=xx-clang CXX=xx-clang++ ./configure \
+  PROTOC_C=/usr/bin/protoc-c CC=xx-clang CXX=xx-clang++ ./configure \
     --host=$(xx-clang --print-target-triple) \
     --prefix=/usr \
     --sysconfdir=/etc \

@@ -41,6 +41,7 @@ ___
 * Latest [Unbound](https://nlnetlabs.nl/projects/unbound/download/) release compiled from source
 * Bind to [unprivileged port](#ports)
 * Multi-platform image
+* DNSTap-ready
 
 ## Build locally
 

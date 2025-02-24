@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1
 
-ARG UNBOUND_VERSION=1.19.3
-ARG LDNS_VERSION=1.8.3
-ARG XX_VERSION=1.4.0
-ARG ALPINE_VERSION=3.19
+ARG UNBOUND_VERSION=1.22.0
+ARG LDNS_VERSION=1.8.4
+ARG XX_VERSION=1.6.1
+ARG ALPINE_VERSION=3.21
 
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_VERSION} AS xx
 
@@ -83,8 +83,8 @@ RUN --mount=type=bind,from=ldns-src,source=/src/ldns,target=.,rw <<EOT
     --disable-rpath \
     --disable-shared \
     --with-drill \
-    --with-ssl=$(xx-info sysroot)usr \
-    --with-trust-anchor=/var/run/unbound/root.key
+    --with-ssl=$(xx-info sysroot)usr #\
+    #--with-trust-anchor=/var/run/unbound/root.key
   make DESTDIR=/out install
   tree /out
   xx-verify /out/usr/bin/drill
@@ -117,7 +117,7 @@ COPY rootfs /
 RUN mkdir -p /config \
   && addgroup -g 1500 unbound \
   && adduser -D -H -u 1500 -G unbound -s /bin/sh unbound \
-  && chown -R unbound. /etc/unbound /run/unbound \
+  && chown -R unbound:unbound /etc/unbound /run/unbound \
   && rm -rf /tmp/*
 
 USER unbound
@@ -132,7 +132,7 @@ COPY <<-"EOF" /entrypoint.sh
 	unbound-checkconf /etc/unbound/unbound.conf
 	exec unbound -d -c /etc/unbound/unbound.conf
 EOF
-CMD sh /entrypoint.sh
+CMD ["sh", "/entrypoint.sh"]
 
 HEALTHCHECK --interval=30s --timeout=10s \
   CMD drill -p 5053 unbound.net @127.0.0.1
